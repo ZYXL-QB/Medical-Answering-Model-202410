@@ -1,0 +1,4 @@
+finetune_result/checkpoint-4500/*.safetensors filter=lfs diff=lfs merge=lfs -text
+finetune_result/checkpoint-4500/*.pt filter=lfs diff=lfs merge=lfs -text
+finetune_result/checkpoint-4500/*.pth filter=lfs diff=lfs merge=lfs -text
+finetune_result/checkpoint-4500/*.bin filter=lfs diff=lfs merge=lfs -text
