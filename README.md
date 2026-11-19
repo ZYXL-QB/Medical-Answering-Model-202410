@@ -665,22 +665,22 @@ huggingface-cli download Qwen/Qwen1.5-14B-Chat \
 
 ### 测试结果文件下载
 
-`test_result/` 中共有 18 个 Excel 文件，每份包含 300 条记录。以下按文件名中的模型和配置标识列出下载入口。[浏览结果目录](test_result)
+`test_result/` 收录 18 份原始评测工作簿，保留原文件名与文件内容。其中 9 份 MedQA Mainland（MCMLE）每份包含 3,426 条记录，9 份 MedQA US（USMLE）每份包含 1,273 条记录。[浏览结果目录](test_result)
 
-文件名前缀为目标百分比。固定 300 条时，正确题数取整数，因此评分列统计的百分比可能与文件名前缀略有差异。
+下表依据原文件名中的 RAG 标识和 LoRA 秩列示配置。英文数据集在这些文件名中写作 `MedQA_US`。全部文件名记录的采样参数均为 `temperature=0.95`、`top_p=0.65`、`top_k=20`。
 
-`basic` 表示基础模型组，`inference` 表示加入检索增强推理，`inference_finetuning` 表示同时加入检索增强推理与微调。MedQA Mainland 为中文数据集，MedQA USMLE 为英文数据集，后者在文件名中写作 `MedQA_USS`。
-
-| 模型标识 | 配置 | MedQA Mainland（300 条） | MedQA USMLE（300 条） |
+| 模型标识 | 文件名中的配置 | MedQA Mainland（3,426 条） | MedQA USMLE（1,273 条） |
 | --- | --- | --- | --- |
-| Qwen1.5-14B-Chat | 基础模型（`basic`） | [下载 Excel](test_result/73.29_predict_MedQA_Mainland_test_use_model_Qwen1.5-14B-Chat_stage_basic.xlsx?raw=true) | [下载 Excel](test_result/45.01_predict_MedQA_USS_test_use_model_Qwen1.5-14B-Chat_stage_basic.xlsx?raw=true) |
-| Qwen1.5-14B-Chat | 检索增强推理（`inference`） | [下载 Excel](test_result/71.98_predict_RAG_MedQA_Mainland_test_use_model_Qwen1.5-14B-Chat_stage_inference.xlsx?raw=true) | [下载 Excel](test_result/52.47_predict_RAG_MedQA_USS_test_use_model_Qwen1.5-14B-Chat_stage_inference.xlsx?raw=true) |
-| Qwen1.5-14B-Chat | 检索增强推理与微调（`inference_finetuning`） | [下载 Excel](test_result/80.58_predict_RAG_MedQA_Mainland_test_use_model_Qwen1.5-14B-Chat_stage_inference_finetuning.xlsx?raw=true) | [下载 Excel](test_result/54.20_predict_RAG_MedQA_USS_test_use_model_Qwen1.5-14B-Chat_stage_inference_finetuning.xlsx?raw=true) |
-| Qwen2-7B-Instruct | 基础模型（`basic`） | [下载 Excel](test_result/70.58_predict_MedQA_Mainland_test_use_model_Qwen2-7B-Instruct_stage_basic.xlsx?raw=true) | [下载 Excel](test_result/42.11_predict_MedQA_USS_test_use_model_Qwen2-7B-Instruct_stage_basic.xlsx?raw=true) |
-| Qwen2-7B-Instruct | 检索增强推理（`inference`） | [下载 Excel](test_result/71.86_predict_RAG_MedQA_Mainland_test_use_model_Qwen2-7B-Instruct_stage_inference.xlsx?raw=true) | [下载 Excel](test_result/46.74_predict_RAG_MedQA_USS_test_use_model_Qwen2-7B-Instruct_stage_inference.xlsx?raw=true) |
-| Qwen2-7B-Instruct | 检索增强推理与微调（`inference_finetuning`） | [下载 Excel](test_result/82.92_predict_RAG_MedQA_Mainland_test_use_model_Qwen2-7B-Instruct_stage_inference_finetuning.xlsx?raw=true) | [下载 Excel](test_result/56.25_predict_RAG_MedQA_USS_test_use_model_Qwen2-7B-Instruct_stage_inference_finetuning.xlsx?raw=true) |
-| Meta-Llama-3-8B-Instruct | 基础模型（`basic`） | [下载 Excel](test_result/55.81_predict_MedQA_Mainland_test_use_model_Meta-Llama-3-8B-Instruct_stage_basic.xlsx?raw=true) | [下载 Excel](test_result/42.97_predict_MedQA_USS_test_use_model_Meta-Llama-3-8B-Instruct_stage_basic.xlsx?raw=true) |
-| Meta-Llama-3-8B-Instruct | 检索增强推理（`inference`） | [下载 Excel](test_result/55.14_predict_RAG_MedQA_Mainland_test_use_model_Meta-Llama-3-8B-Instruct_stage_inference.xlsx?raw=true) | [下载 Excel](test_result/57.97_predict_RAG_MedQA_USS_test_use_model_Meta-Llama-3-8B-Instruct_stage_inference.xlsx?raw=true) |
-| Meta-Llama-3-8B-Instruct | 检索增强推理与微调（`inference_finetuning`） | [下载 Excel](test_result/76.24_predict_RAG_MedQA_Mainland_test_use_model_Meta-Llama-3-8B-Instruct_stage_inference_finetuning.xlsx?raw=true) | [下载 Excel](test_result/64.02_predict_RAG_MedQA_USS_test_use_model_Meta-Llama-3-8B-Instruct_stage_inference_finetuning.xlsx?raw=true) |
+| Qwen1.5-14B-Chat | 文件名无 RAG 标识，LoRA r=0 | [下载 Excel](test_result/73.29_predict_MedQA_Mainland_test_use_model_Qwen1.5-14B-Chat_lora_r_0_lr_0.0_checkpoint_-1_with_temperature_0.95_top_p_0.65_top_k_20.xlsx?raw=true) | [下载 Excel](test_result/45.01_predict_MedQA_US_test_use_model_Qwen1.5-14B-Chat_lora_r_0_lr_0.0_checkpoint_-1_with_temperature_0.95_top_p_0.65_top_k_20.xlsx?raw=true) |
+| Qwen1.5-14B-Chat | 文件名含 RAG 标识，LoRA r=0 | [下载 Excel](test_result/71.98_predict_RAG_MedQA_Mainland_test_use_model_Qwen1.5-14B-Chat_lora_r_0_lr_0.0_checkpoint_-1_with_temperature_0.95_top_p_0.65_top_k_20.xlsx?raw=true) | [下载 Excel](test_result/52.47_predict_RAG_MedQA_US_test_use_model_Qwen1.5-14B-Chat_lora_r_0_lr_0.0_checkpoint_-1_with_temperature_0.95_top_p_0.65_top_k_20.xlsx?raw=true) |
+| Qwen1.5-14B-Chat | 文件名含 RAG 标识，LoRA r>0 | [下载 Excel](test_result/80.58_predict_RAG_MedQA_Mainland_test_use_model_Qwen1.5-14B-Chat_lora_r_8_lr_0.0001_checkpoint_9000_with_temperature_0.95_top_p_0.65_top_k_20.xlsx?raw=true) | [下载 Excel](test_result/54.2_predict_RAG_MedQA_US_test_use_model_Qwen1.5-14B-Chat_lora_r_32_lr_0.00005_checkpoint_0_with_temperature_0.95_top_p_0.65_top_k_20.xlsx?raw=true) |
+| Qwen2-7B-Instruct | 文件名无 RAG 标识，LoRA r=0 | [下载 Excel](test_result/70.58_predict_MedQA_Mainland_test_use_model_Qwen2-7B-Instruct_lora_r_0_lr_0.0_checkpoint_-1_with_temperature_0.95_top_p_0.65_top_k_20.xlsx?raw=true) | [下载 Excel](test_result/42.11_predict_MedQA_US_test_use_model_Qwen2-7B-Instruct_lora_r_0_lr_0.0_checkpoint_-1_with_temperature_0.95_top_p_0.65_top_k_20.xlsx?raw=true) |
+| Qwen2-7B-Instruct | 文件名含 RAG 标识，LoRA r=0 | [下载 Excel](test_result/71.86_predict_RAG_MedQA_Mainland_test_use_model_Qwen2-7B-Instruct_lora_r_0_lr_0.0_checkpoint_-1_with_temperature_0.95_top_p_0.65_top_k_20.xlsx?raw=true) | [下载 Excel](test_result/46.74_predict_RAG_MedQA_US_test_use_model_Qwen2-7B-Instruct_lora_r_0_lr_0.0_checkpoint_-1_with_temperature_0.95_top_p_0.65_top_k_20.xlsx?raw=true) |
+| Qwen2-7B-Instruct | 文件名含 RAG 标识，LoRA r>0 | [下载 Excel](test_result/82.92_predict_RAG_MedQA_Mainland_test_use_model_Qwen2-7B-Instruct_lora_r_32_lr_0.0001_checkpoint_0_with_temperature_0.95_top_p_0.65_top_k_20.xlsx?raw=true) | [下载 Excel](test_result/56.25_predict_RAG_MedQA_US_test_use_model_Qwen2-7B-Instruct_lora_r_32_lr_0.00005_checkpoint_0_with_temperature_0.95_top_p_0.65_top_k_20.xlsx?raw=true) |
+| Meta-Llama-3-8B-Instruct | 文件名无 RAG 标识，LoRA r=0 | [下载 Excel](test_result/55.81_predict_MedQA_Mainland_test_use_model_Meta-Llama-3-8B-Instruct_lora_r_0_lr_0.0_checkpoint_-1_with_temperature_0.95_top_p_0.65_top_k_20.xlsx?raw=true) | [下载 Excel](test_result/57.97_predict_MedQA_US_test_use_model_Meta-Llama-3-8B-Instruct_lora_r_0_lr_0.0_checkpoint_-1_with_temperature_0.95_top_p_0.65_top_k_20.xlsx?raw=true) |
+| Meta-Llama-3-8B-Instruct | 文件名含 RAG 标识，LoRA r=0 | [下载 Excel](test_result/55.14_predict_RAG_MedQA_Mainland_test_use_model_Meta-Llama-3-8B-Instruct_lora_r_0_lr_0.0_checkpoint_-1_with_temperature_0.95_top_p_0.65_top_k_20.xlsx?raw=true) | [下载 Excel](test_result/42.97_predict_RAG_MedQA_US_test_use_model_Meta-Llama-3-8B-Instruct_lora_r_0_lr_0.0_checkpoint_-1_with_temperature_0.95_top_p_0.65_top_k_20.xlsx?raw=true) |
+| Meta-Llama-3-8B-Instruct | 文件名含 RAG 标识，LoRA r>0 | [下载 Excel](test_result/76.24_predict_RAG_MedQA_Mainland_test_use_model_Meta-Llama-3-8B-Instruct_lora_r_32_lr_0.0001_checkpoint_0_with_temperature_0.95_top_p_0.65_top_k_20.xlsx?raw=true) | [下载 Excel](test_result/64.02_predict_RAG_MedQA_US_test_use_model_Meta-Llama-3-8B-Instruct_lora_r_32_lr_0.0001_checkpoint_0_with_temperature_0.95_top_p_0.65_top_k_20.xlsx?raw=true) |
 
-每份文件保留原版 `Sheet1` 的 37 列，包含预测答案、评分、回复正文及 10 组检索知识；`Sheet2` 包含正确数、错误数、总数和准确率。
+[下载本表全部 18 个 Excel（ZIP，99.2 MiB）](test_result/MAM_results_18.zip?raw=true)
+
+每份工作簿保留原版 `Sheet1` 和 `Sheet2`。`Sheet1` 包含 37 列，包括问题、标准答案、预测答案、评分、模型原始输出及 10 组检索知识；`Sheet2` 保留原始统计布局。文件名前缀不作调整，准确率以工作簿内的评分和统计为准。各组 LoRA 秩、学习率及 checkpoint 标识保留在原文件名中。
