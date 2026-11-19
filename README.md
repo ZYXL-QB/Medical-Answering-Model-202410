@@ -127,13 +127,7 @@ huggingface-cli download meta-llama/Meta-Llama-3-8B-Instruct \
     --local-dir "$MODEL_DIR/Meta-Llama-3-8B-Instruct"
 ```
 
-快速测试使用 `Qwen1.5-14B-Chat`。需要本地加载该版本时，下载官方 Chat 权重并设置 `QWEN_MODEL`。 [Qwen1.5-14B-Chat](https://huggingface.co/Qwen/Qwen1.5-14B-Chat) · `https://huggingface.co/Qwen/Qwen1.5-14B-Chat`
-
-```bash
-huggingface-cli download Qwen/Qwen1.5-14B-Chat \
-    --local-dir "$PWD/models/Qwen1.5-14B-Chat"
-export QWEN_MODEL="$PWD/models/Qwen1.5-14B-Chat"
-```
+快速测试使用 `Qwen1.5-14B-Chat`，默认从魔搭官方仓库下载。企业目录 `Qwen1.5-14B/` 对应基座版。Chat 权重的下载及 Hugging Face 备选命令见[快速测试](#快速测试)。 [魔搭 Qwen1.5-14B-Chat](https://modelscope.cn/models/Qwen/Qwen1.5-14B-Chat/files) · `https://modelscope.cn/models/Qwen/Qwen1.5-14B-Chat/files`
 
 ## MedQA数据集
 * 数据集来源：[https://github.com/jind11/MedQA](https://github.com/jind11/MedQA)
@@ -560,13 +554,12 @@ python format_json_dataset_for_eval_from_jsonl.py \
 
 ## 快速测试
 
-在已激活的 `llama_factory` 环境中，从仓库根目录复制执行整段命令。测试使用单张 NVIDIA A800 80GB GPU（CUDA），以 Qwen1.5-14B-Chat 基座对预处理 MedQA Mainland 文件的前 300 条带知识样本运行预测。默认通过 Hugging Face 加载模型。已有本地模型时，先将 `QWEN_MODEL` 设为模型目录。 [Qwen1.5-14B-Chat](https://huggingface.co/Qwen/Qwen1.5-14B-Chat) · [预处理 MedQA 数据](data/MedQA/RAG_MedQA_Mainland_train_500%28example%29.json)
+在已激活的 `llama_factory` 环境中，从仓库根目录复制执行整段命令。测试使用单张 NVIDIA A800 80GB GPU（CUDA），以 Qwen1.5-14B-Chat 对预处理 MedQA Mainland 文件的前 300 条带知识样本运行预测。默认从魔搭官方仓库下载到 `models/Qwen1.5-14B-Chat/` 后，使用本地模型目录运行预测。已有本地 Chat 权重时，先将 `QWEN_MODEL` 设为该模型目录。 [魔搭 Qwen1.5-14B-Chat](https://modelscope.cn/models/Qwen/Qwen1.5-14B-Chat/files) · `https://modelscope.cn/models/Qwen/Qwen1.5-14B-Chat/files` · [预处理 MedQA 数据](data/MedQA/RAG_MedQA_Mainland_train_500%28example%29.json)
 
 ```bash
 (
 set -e
 export CUDA_VISIBLE_DEVICES="${CUDA_VISIBLE_DEVICES:-0}"
-QWEN_MODEL="${QWEN_MODEL:-Qwen/Qwen1.5-14B-Chat}"
 DATASET='RAG_MedQA_Mainland_train_500(example)'
 SAMPLE_COUNT=300
 
@@ -595,6 +588,15 @@ if len(samples) != sample_count:
     raise SystemExit(f"The prepared MedQA dataset needs at least {sample_count} examples.")
 Path(sys.argv[1]).write_text(json.dumps(samples, ensure_ascii=False), encoding="utf-8")
 PY
+
+if [ -z "${QWEN_MODEL:-}" ]; then
+    QWEN_MODEL="$PWD/models/Qwen1.5-14B-Chat"
+    python -m pip install modelscope-hub==0.7.1
+    ms-hub download Qwen/Qwen1.5-14B-Chat --revision master \
+        --local-dir "$QWEN_MODEL"
+fi
+test -f "$QWEN_MODEL/config.json"
+test -f "$QWEN_MODEL/model.safetensors.index.json"
 
 llamafactory-cli train \
     --model_name_or_path "$QWEN_MODEL" \
@@ -631,3 +633,13 @@ PY
 ```
 
 每次运行都会在 `results/quick_eval_*` 下写入 300 条样本、预测 JSONL 和 Excel。输出 `Quick test passed` 表示 Excel 包含 300 行非空预测。这些样本来自训练示例，用于验证推理流程。
+
+### Hugging Face 备选方案
+
+魔搭下载不可用时，可先通过 Hugging Face 下载同一 Chat 版本并设置本地模型目录，再执行上面的整段快速测试命令。 [Hugging Face Qwen1.5-14B-Chat](https://huggingface.co/Qwen/Qwen1.5-14B-Chat) · `https://huggingface.co/Qwen/Qwen1.5-14B-Chat`
+
+```bash
+huggingface-cli download Qwen/Qwen1.5-14B-Chat \
+    --local-dir "$PWD/models/Qwen1.5-14B-Chat"
+export QWEN_MODEL="$PWD/models/Qwen1.5-14B-Chat"
+```

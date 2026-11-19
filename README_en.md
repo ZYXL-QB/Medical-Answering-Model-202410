@@ -118,13 +118,7 @@ huggingface-cli download meta-llama/Meta-Llama-3-8B-Instruct \
     --local-dir "$MODEL_DIR/Meta-Llama-3-8B-Instruct"
 ```
 
-The quick test uses `Qwen1.5-14B-Chat`. To load that version from disk, download the official Chat weights and set `QWEN_MODEL`. [Qwen1.5-14B-Chat](https://huggingface.co/Qwen/Qwen1.5-14B-Chat) · `https://huggingface.co/Qwen/Qwen1.5-14B-Chat`
-
-```bash
-huggingface-cli download Qwen/Qwen1.5-14B-Chat \
-    --local-dir "$PWD/models/Qwen1.5-14B-Chat"
-export QWEN_MODEL="$PWD/models/Qwen1.5-14B-Chat"
-```
+The quick test uses `Qwen1.5-14B-Chat` and downloads it from the official ModelScope repository by default. The enterprise `Qwen1.5-14B/` directory is designated for the base model. See [Quick Test](#quick-test) for Chat downloads and the Hugging Face alternative. [ModelScope Qwen1.5-14B-Chat](https://modelscope.cn/models/Qwen/Qwen1.5-14B-Chat/files) · `https://modelscope.cn/models/Qwen/Qwen1.5-14B-Chat/files`
 
 ## MedQA Dataset
 
@@ -499,13 +493,12 @@ python format_json_dataset_for_eval_from_jsonl.py \
 
 ## Quick Test
 
-Run the entire block from the repository root with the `llama_factory` environment active. This test uses one NVIDIA A800 80GB GPU and runs the base Qwen1.5-14B-Chat model on the first 300 prepared MedQA Mainland examples with retrieved knowledge. The default model source is Hugging Face. Set `QWEN_MODEL` to the model directory if the weights are already on disk. [Qwen1.5-14B-Chat](https://huggingface.co/Qwen/Qwen1.5-14B-Chat) · [Prepared MedQA data](data/MedQA/RAG_MedQA_Mainland_train_500%28example%29.json)
+Run the entire block from the repository root with the `llama_factory` environment active. This test uses one NVIDIA A800 80GB GPU to run Qwen1.5-14B-Chat on the first 300 prepared MedQA Mainland examples with retrieved knowledge. By default, the block downloads the weights from the official ModelScope repository to `models/Qwen1.5-14B-Chat/` and loads that local directory for prediction. To use Chat weights already on disk, set `QWEN_MODEL` to their local directory first. [ModelScope Qwen1.5-14B-Chat](https://modelscope.cn/models/Qwen/Qwen1.5-14B-Chat/files) · `https://modelscope.cn/models/Qwen/Qwen1.5-14B-Chat/files` · [Prepared MedQA data](data/MedQA/RAG_MedQA_Mainland_train_500%28example%29.json)
 
 ```bash
 (
 set -e
 export CUDA_VISIBLE_DEVICES="${CUDA_VISIBLE_DEVICES:-0}"
-QWEN_MODEL="${QWEN_MODEL:-Qwen/Qwen1.5-14B-Chat}"
 DATASET='RAG_MedQA_Mainland_train_500(example)'
 SAMPLE_COUNT=300
 
@@ -534,6 +527,15 @@ if len(samples) != sample_count:
     raise SystemExit(f"The prepared MedQA dataset needs at least {sample_count} examples.")
 Path(sys.argv[1]).write_text(json.dumps(samples, ensure_ascii=False), encoding="utf-8")
 PY
+
+if [ -z "${QWEN_MODEL:-}" ]; then
+    QWEN_MODEL="$PWD/models/Qwen1.5-14B-Chat"
+    python -m pip install modelscope-hub==0.7.1
+    ms-hub download Qwen/Qwen1.5-14B-Chat --revision master \
+        --local-dir "$QWEN_MODEL"
+fi
+test -f "$QWEN_MODEL/config.json"
+test -f "$QWEN_MODEL/model.safetensors.index.json"
 
 llamafactory-cli train \
     --model_name_or_path "$QWEN_MODEL" \
@@ -570,3 +572,13 @@ PY
 ```
 
 Each run saves the 300 input examples, prediction JSONL, and workbook in a new `results/quick_eval_*` directory. `Quick test passed` confirms that the workbook contains 300 non-empty predictions. The samples come from the training examples and serve as a workflow check.
+
+### Alternative download from Hugging Face
+
+If ModelScope downloads are unavailable, download the same Chat version from Hugging Face, set its local path, and then run the full quick-test block above. [Hugging Face Qwen1.5-14B-Chat](https://huggingface.co/Qwen/Qwen1.5-14B-Chat) · `https://huggingface.co/Qwen/Qwen1.5-14B-Chat`
+
+```bash
+huggingface-cli download Qwen/Qwen1.5-14B-Chat \
+    --local-dir "$PWD/models/Qwen1.5-14B-Chat"
+export QWEN_MODEL="$PWD/models/Qwen1.5-14B-Chat"
+```
