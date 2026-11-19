@@ -71,6 +71,8 @@ source ~/.bashrc
 
 Use the enterprise ModelScope repositories as the primary source for the following models. The Qwen repository uses separate subdirectories for each version. The Llama repository stores its model files at the root.
 
+Run the commands in this section from the repository root to download the weights directly into this repository's `model/` directory. Each model uses the named subdirectory shown below. The ModelScope commands and Hugging Face alternatives already specify these destinations.
+
 | Model | Enterprise ModelScope URL | Repository subdirectory | Local model directory |
 | --- | --- | --- | --- |
 | Qwen1.5-14B (base model) | [Browse model files](https://modelscope.cn/models/zyxl2026/Qwen/files) · `https://modelscope.cn/models/zyxl2026/Qwen/files` | `Qwen1.5-14B/` | `model/Qwen1.5-14B/` |
@@ -118,7 +120,7 @@ huggingface-cli download meta-llama/Meta-Llama-3-8B-Instruct \
     --local-dir "$MODEL_DIR/Meta-Llama-3-8B-Instruct"
 ```
 
-The quick test uses `Qwen1.5-14B-Chat` and downloads it from the official ModelScope repository by default. The enterprise `Qwen1.5-14B/` directory is designated for the base model. See [Quick Test](#quick-test) for Chat downloads and the Hugging Face alternative. [ModelScope Qwen1.5-14B-Chat](https://modelscope.cn/models/Qwen/Qwen1.5-14B-Chat/files) · `https://modelscope.cn/models/Qwen/Qwen1.5-14B-Chat/files`
+The quick test uses `Qwen1.5-14B-Chat` and downloads it from the official ModelScope repository into `model/Qwen1.5-14B-Chat/` by default. The enterprise `Qwen1.5-14B/` directory is designated for the base model. See [Quick Test](#quick-test) for Chat downloads and the Hugging Face alternative. [ModelScope Qwen1.5-14B-Chat](https://modelscope.cn/models/Qwen/Qwen1.5-14B-Chat/files) · `https://modelscope.cn/models/Qwen/Qwen1.5-14B-Chat/files`
 
 ## MedQA Dataset
 

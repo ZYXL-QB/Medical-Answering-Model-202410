@@ -80,6 +80,8 @@ source ~/.bashrc
 
 优先使用企业魔搭仓库获取以下三个模型。Qwen 系列通过仓库内的子目录区分版本，Llama 权重位于单独仓库的根目录。
 
+从仓库根目录执行本节命令，模型权重会直接下载到本仓库的 `model/` 目录，并按模型名称保存到下表所示的子目录。魔搭和 Hugging Face 备选命令都已设置好下载路径，复制对应命令即可。
+
 | 模型 | 企业魔搭地址 | 仓库内目录 | 本地模型目录 |
 | --- | --- | --- | --- |
 | Qwen1.5-14B（基座版） | [打开模型文件](https://modelscope.cn/models/zyxl2026/Qwen/files) · `https://modelscope.cn/models/zyxl2026/Qwen/files` | `Qwen1.5-14B/` | `model/Qwen1.5-14B/` |
@@ -127,7 +129,7 @@ huggingface-cli download meta-llama/Meta-Llama-3-8B-Instruct \
     --local-dir "$MODEL_DIR/Meta-Llama-3-8B-Instruct"
 ```
 
-快速测试使用 `Qwen1.5-14B-Chat`，默认从魔搭官方仓库下载。企业目录 `Qwen1.5-14B/` 对应基座版。Chat 权重的下载及 Hugging Face 备选命令见[快速测试](#快速测试)。 [魔搭 Qwen1.5-14B-Chat](https://modelscope.cn/models/Qwen/Qwen1.5-14B-Chat/files) · `https://modelscope.cn/models/Qwen/Qwen1.5-14B-Chat/files`
+快速测试使用 `Qwen1.5-14B-Chat`，默认从魔搭官方仓库下载到 `model/Qwen1.5-14B-Chat/`。企业目录 `Qwen1.5-14B/` 对应基座版。Chat 权重的下载及 Hugging Face 备选命令见[快速测试](#快速测试)。 [魔搭 Qwen1.5-14B-Chat](https://modelscope.cn/models/Qwen/Qwen1.5-14B-Chat/files) · `https://modelscope.cn/models/Qwen/Qwen1.5-14B-Chat/files`
 
 ## MedQA数据集
 * 数据集来源：[https://github.com/jind11/MedQA](https://github.com/jind11/MedQA)
