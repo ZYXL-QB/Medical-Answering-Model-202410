@@ -466,6 +466,8 @@ CUDA_VISIBLE_DEVICES=0 ./run_single_gpu_train_model.sh 8 0.0001
 
 ### 测试
 
+仓库提供的微调结果位于 `finetune_result/checkpoint-4500/`，其中的 LoRA 适配器基于 `Llama-3.1-8B-Instruct` 训练。使用 `checkpoint-4500` 进行推理时，先通过 Git LFS 获取权重文件，将 `ADAPTER_NAME_OR_PATH` 指向该目录，将 `MODEL_NAME_OR_PATH` 指向配套的基座权重，并选择对应的 `--template` 对话模板。 [checkpoint-4500](finetune_result/checkpoint-4500) · [适配器配置](finetune_result/checkpoint-4500/adapter_config.json)
+
 测试前，需要修改[./train_model/run_single_gpu_predict_model.sh](./train_model/run_single_gpu_predict_model.sh)的如下变量
 
 | 变量名 | 含义或用途                                                                                                                                                                       |

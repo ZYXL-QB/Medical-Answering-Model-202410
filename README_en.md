@@ -441,6 +441,8 @@ CUDA_VISIBLE_DEVICES=0 ./run_single_gpu_train_model.sh 8 0.0001
 
 ### Run checkpoint-based prediction
 
+The bundled fine-tuning results are stored in `finetune_result/checkpoint-4500/`. This checkpoint contains a LoRA adapter trained on `Llama-3.1-8B-Instruct`. To run inference with `checkpoint-4500`, retrieve the weight files through Git LFS, point `ADAPTER_NAME_OR_PATH` to this directory, set `MODEL_NAME_OR_PATH` to the matching base model weights, and select the corresponding `--template` conversation template. [checkpoint-4500](finetune_result/checkpoint-4500) · [Adapter configuration](finetune_result/checkpoint-4500/adapter_config.json)
+
 Configure `ROOT_BASE_DIR`, `MODEL_NAME_OR_PATH`, `ADAPTER_NAME_OR_PATH`, `DATASET`, and `RESULT_BASE_SAVE_DIR` in the single-GPU prediction script. Set `--template` for the base model. `ADAPTER_NAME_OR_PATH` can include `checkpoint-${checkpoint_steps}` to select a training checkpoint, or it can point to a specific adapter directory. [Prediction script](train_model/run_single_gpu_predict_model.sh)
 
 Register the intended evaluation dataset in `data/dataset_info.json` with the same `sharegpt` message mapping. The historical example registers `RAG_MedQA_Mainland_test_300.json` under `RAG_MedQA_Mainland_test_300`.
