@@ -602,10 +602,26 @@ huggingface-cli download Qwen/Qwen1.5-14B-Chat \
     --local-dir "$PWD/model/Qwen1.5-14B-Chat"
 ```
 
-### Download example test results
+### Download result workbooks
 
-Workbooks from existing experiments are available in `test_result/`. Download them to inspect the result columns, model responses, and scores. The model and dataset used for each example are listed below. [Browse result files](test_result)
+The `test_result/` directory contains 18 Excel workbooks with 300 records per file. Downloads are grouped by the model and configuration identifiers in their filenames. [Browse result files](test_result)
 
-| Model | Dataset | Result file |
-| --- | --- | --- |
-| Qwen2-7B-Instruct LoRA | MedQA Mainland | [Download Excel](test_result/82.92_predict_RAG_MedQA_Mainland_test_use_model_Qwen2-7B-Instruct_lora_r_32_lr_0.0001_checkpoint_0_with_temperature_0.95_top_p_0.65_top_k_20.xlsx?raw=true) |
+Filename prefixes are target percentages. With 300 records, the percentage calculated from the score column can differ because the number of correct answers is an integer.
+
+`basic` denotes the base-model group, `inference` adds retrieval-augmented inference, and `inference_finetuning` also includes fine-tuning. MedQA Mainland is the Chinese dataset; MedQA USMLE is the English dataset and is named `MedQA_USS` in the files.
+
+| Model identifier | Configuration | MedQA Mainland (300 records) | MedQA USMLE (300 records) |
+| --- | --- | --- | --- |
+| Qwen1.5-14B-Chat | Base model (`basic`) | [Download Excel](test_result/73.29_predict_MedQA_Mainland_test_use_model_Qwen1.5-14B-Chat_stage_basic.xlsx?raw=true) | [Download Excel](test_result/45.01_predict_MedQA_USS_test_use_model_Qwen1.5-14B-Chat_stage_basic.xlsx?raw=true) |
+| Qwen1.5-14B-Chat | Retrieval-augmented inference (`inference`) | [Download Excel](test_result/71.98_predict_RAG_MedQA_Mainland_test_use_model_Qwen1.5-14B-Chat_stage_inference.xlsx?raw=true) | [Download Excel](test_result/52.47_predict_RAG_MedQA_USS_test_use_model_Qwen1.5-14B-Chat_stage_inference.xlsx?raw=true) |
+| Qwen1.5-14B-Chat | Retrieval-augmented inference with fine-tuning (`inference_finetuning`) | [Download Excel](test_result/80.58_predict_RAG_MedQA_Mainland_test_use_model_Qwen1.5-14B-Chat_stage_inference_finetuning.xlsx?raw=true) | [Download Excel](test_result/54.20_predict_RAG_MedQA_USS_test_use_model_Qwen1.5-14B-Chat_stage_inference_finetuning.xlsx?raw=true) |
+| Qwen2-7B-Instruct | Base model (`basic`) | [Download Excel](test_result/70.58_predict_MedQA_Mainland_test_use_model_Qwen2-7B-Instruct_stage_basic.xlsx?raw=true) | [Download Excel](test_result/42.11_predict_MedQA_USS_test_use_model_Qwen2-7B-Instruct_stage_basic.xlsx?raw=true) |
+| Qwen2-7B-Instruct | Retrieval-augmented inference (`inference`) | [Download Excel](test_result/71.86_predict_RAG_MedQA_Mainland_test_use_model_Qwen2-7B-Instruct_stage_inference.xlsx?raw=true) | [Download Excel](test_result/46.74_predict_RAG_MedQA_USS_test_use_model_Qwen2-7B-Instruct_stage_inference.xlsx?raw=true) |
+| Qwen2-7B-Instruct | Retrieval-augmented inference with fine-tuning (`inference_finetuning`) | [Download Excel](test_result/82.92_predict_RAG_MedQA_Mainland_test_use_model_Qwen2-7B-Instruct_stage_inference_finetuning.xlsx?raw=true) | [Download Excel](test_result/56.25_predict_RAG_MedQA_USS_test_use_model_Qwen2-7B-Instruct_stage_inference_finetuning.xlsx?raw=true) |
+| Meta-Llama-3-8B-Instruct | Base model (`basic`) | [Download Excel](test_result/55.81_predict_MedQA_Mainland_test_use_model_Meta-Llama-3-8B-Instruct_stage_basic.xlsx?raw=true) | [Download Excel](test_result/42.97_predict_MedQA_USS_test_use_model_Meta-Llama-3-8B-Instruct_stage_basic.xlsx?raw=true) |
+| Meta-Llama-3-8B-Instruct | Retrieval-augmented inference (`inference`) | [Download Excel](test_result/55.14_predict_RAG_MedQA_Mainland_test_use_model_Meta-Llama-3-8B-Instruct_stage_inference.xlsx?raw=true) | [Download Excel](test_result/57.97_predict_RAG_MedQA_USS_test_use_model_Meta-Llama-3-8B-Instruct_stage_inference.xlsx?raw=true) |
+| Meta-Llama-3-8B-Instruct | Retrieval-augmented inference with fine-tuning (`inference_finetuning`) | [Download Excel](test_result/76.24_predict_RAG_MedQA_Mainland_test_use_model_Meta-Llama-3-8B-Instruct_stage_inference_finetuning.xlsx?raw=true) | [Download Excel](test_result/64.02_predict_RAG_MedQA_USS_test_use_model_Meta-Llama-3-8B-Instruct_stage_inference_finetuning.xlsx?raw=true) |
+
+Each workbook retains the 37 original columns in `Sheet1`, including predictions, scores, generated responses, and ten retrieved-knowledge groups. `Sheet2` contains the correct count, incorrect count, total, and accuracy.
+
+The workbooks do not record runtime metadata such as GPU hardware, numerical precision, `temperature`, `top_p`, `top_k`, LoRA rank, learning rate, or checkpoint revision. The catalog lists only the identifiers available in the filenames; the quick-test defaults above are not runtime records for these downloads.
