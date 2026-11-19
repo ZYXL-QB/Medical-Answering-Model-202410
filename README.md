@@ -662,3 +662,11 @@ PY
 huggingface-cli download Qwen/Qwen1.5-14B-Chat \
     --local-dir "$PWD/model/Qwen1.5-14B-Chat"
 ```
+
+### 测试结果示例下载
+
+已有实验的结果 Excel 保存在 `test_result/` 中，可下载查看结果表结构、模型回复和计分内容。示例使用的模型与数据集如下。 [浏览结果目录](test_result)
+
+| 模型 | 数据集 | 结果文件 |
+| --- | --- | --- |
+| Qwen2-7B-Instruct LoRA | MedQA Mainland | [下载 Excel](test_result/82.92_predict_RAG_MedQA_Mainland_test_use_model_Qwen2-7B-Instruct_lora_r_32_lr_0.0001_checkpoint_0_with_temperature_0.95_top_p_0.65_top_k_20.xlsx?raw=true) |

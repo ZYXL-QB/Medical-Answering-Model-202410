@@ -601,3 +601,11 @@ If ModelScope downloads are unavailable, download the same Chat version into the
 huggingface-cli download Qwen/Qwen1.5-14B-Chat \
     --local-dir "$PWD/model/Qwen1.5-14B-Chat"
 ```
+
+### Download example test results
+
+Workbooks from existing experiments are available in `test_result/`. Download them to inspect the result columns, model responses, and scores. The model and dataset used for each example are listed below. [Browse result files](test_result)
+
+| Model | Dataset | Result file |
+| --- | --- | --- |
+| Qwen2-7B-Instruct LoRA | MedQA Mainland | [Download Excel](test_result/82.92_predict_RAG_MedQA_Mainland_test_use_model_Qwen2-7B-Instruct_lora_r_32_lr_0.0001_checkpoint_0_with_temperature_0.95_top_p_0.65_top_k_20.xlsx?raw=true) |
