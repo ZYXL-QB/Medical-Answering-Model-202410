@@ -684,5 +684,3 @@ huggingface-cli download Qwen/Qwen1.5-14B-Chat \
 | Meta-Llama-3-8B-Instruct | 检索增强推理与微调（`inference_finetuning`） | [下载 Excel](test_result/76.24_predict_RAG_MedQA_Mainland_test_use_model_Meta-Llama-3-8B-Instruct_stage_inference_finetuning.xlsx?raw=true) | [下载 Excel](test_result/64.02_predict_RAG_MedQA_USS_test_use_model_Meta-Llama-3-8B-Instruct_stage_inference_finetuning.xlsx?raw=true) |
 
 每份文件保留原版 `Sheet1` 的 37 列，包含预测答案、评分、回复正文及 10 组检索知识；`Sheet2` 包含正确数、错误数、总数和准确率。
-
-文件未记录 GPU、运行精度、`temperature`、`top_p`、`top_k`、LoRA 秩、学习率及 checkpoint 版本等运行元数据。本清单仅列出文件名可以确认的标识，上方快速测试命令的默认值不作为这些下载文件的运行参数记录。

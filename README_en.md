@@ -623,5 +623,3 @@ Filename prefixes are target percentages. With 300 records, the percentage calcu
 | Meta-Llama-3-8B-Instruct | Retrieval-augmented inference with fine-tuning (`inference_finetuning`) | [Download Excel](test_result/76.24_predict_RAG_MedQA_Mainland_test_use_model_Meta-Llama-3-8B-Instruct_stage_inference_finetuning.xlsx?raw=true) | [Download Excel](test_result/64.02_predict_RAG_MedQA_USS_test_use_model_Meta-Llama-3-8B-Instruct_stage_inference_finetuning.xlsx?raw=true) |
 
 Each workbook retains the 37 original columns in `Sheet1`, including predictions, scores, generated responses, and ten retrieved-knowledge groups. `Sheet2` contains the correct count, incorrect count, total, and accuracy.
-
-The workbooks do not record runtime metadata such as GPU hardware, numerical precision, `temperature`, `top_p`, `top_k`, LoRA rank, learning rate, or checkpoint revision. The catalog lists only the identifiers available in the filenames; the quick-test defaults above are not runtime records for these downloads.
