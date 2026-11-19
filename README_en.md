@@ -73,15 +73,15 @@ Use the enterprise ModelScope repositories as the primary source for the followi
 
 | Model | Enterprise ModelScope URL | Repository subdirectory | Local model directory |
 | --- | --- | --- | --- |
-| Qwen1.5-14B (base model) | [Browse model files](https://modelscope.cn/models/zyxl2026/Qwen/files) · `https://modelscope.cn/models/zyxl2026/Qwen/files` | `Qwen1.5-14B/` | `models/Qwen1.5-14B/` |
-| Qwen2-7B-Instruct | [Browse model files](https://modelscope.cn/models/zyxl2026/Qwen/files) · `https://modelscope.cn/models/zyxl2026/Qwen/files` | `Qwen2-7B-Instruct/` | `models/Qwen2-7B-Instruct/` |
-| Meta-Llama-3-8B-Instruct | [Browse model files](https://modelscope.cn/models/zyxl2026/Llama/files) · `https://modelscope.cn/models/zyxl2026/Llama/files` | Repository root | `models/Meta-Llama-3-8B-Instruct/` |
+| Qwen1.5-14B (base model) | [Browse model files](https://modelscope.cn/models/zyxl2026/Qwen/files) · `https://modelscope.cn/models/zyxl2026/Qwen/files` | `Qwen1.5-14B/` | `model/Qwen1.5-14B/` |
+| Qwen2-7B-Instruct | [Browse model files](https://modelscope.cn/models/zyxl2026/Qwen/files) · `https://modelscope.cn/models/zyxl2026/Qwen/files` | `Qwen2-7B-Instruct/` | `model/Qwen2-7B-Instruct/` |
+| Meta-Llama-3-8B-Instruct | [Browse model files](https://modelscope.cn/models/zyxl2026/Llama/files) · `https://modelscope.cn/models/zyxl2026/Llama/files` | Repository root | `model/Meta-Llama-3-8B-Instruct/` |
 
 Once the complete weights have been published to these locations, run the relevant commands below from the repository root. If an enterprise repository still contains only its initialization files, use the Hugging Face alternative below.
 
 ```bash
 python -m pip install modelscope-hub==0.7.1
-MODEL_DIR="$PWD/models"
+MODEL_DIR="$PWD/model"
 mkdir -p "$MODEL_DIR"
 
 ms-hub download zyxl2026/Qwen --revision master \
@@ -107,7 +107,7 @@ Use the `huggingface-hub` package included in the project dependencies to downlo
 Before downloading Llama, request access and accept the license on the official model page. Run `huggingface-cli login` with the account that has been granted access.
 
 ```bash
-MODEL_DIR="$PWD/models"
+MODEL_DIR="$PWD/model"
 mkdir -p "$MODEL_DIR"
 
 huggingface-cli download Qwen/Qwen1.5-14B \
@@ -493,12 +493,37 @@ python format_json_dataset_for_eval_from_jsonl.py \
 
 ## Quick Test
 
-Run the entire block from the repository root with the `llama_factory` environment active. This test uses one NVIDIA A800 80GB GPU to run Qwen1.5-14B-Chat on the first 300 prepared MedQA Mainland examples with retrieved knowledge. By default, the block downloads the weights from the official ModelScope repository to `models/Qwen1.5-14B-Chat/` and loads that local directory for prediction. To use Chat weights already on disk, set `QWEN_MODEL` to their local directory first. [ModelScope Qwen1.5-14B-Chat](https://modelscope.cn/models/Qwen/Qwen1.5-14B-Chat/files) · `https://modelscope.cn/models/Qwen/Qwen1.5-14B-Chat/files` · [Prepared MedQA data](data/MedQA/RAG_MedQA_Mainland_train_500%28example%29.json)
+With the `llama_factory` environment active, run the following two blocks in order from the repository root. The test uses one NVIDIA A800 80GB GPU to run Qwen1.5-14B-Chat on the first 300 prepared MedQA Mainland examples with retrieved knowledge. The test command uses the fixed local path `model/Qwen1.5-14B-Chat/`. [Prepared MedQA data](data/MedQA/RAG_MedQA_Mainland_train_500%28example%29.json)
+
+### 1. Download the model
+
+Download the official Chat weights from ModelScope into `model/Qwen1.5-14B-Chat/` in this repository. The initial download is approximately 28.35 GB. Rerun the same block to resume an interrupted download. [ModelScope model files](https://modelscope.cn/models/Qwen/Qwen1.5-14B-Chat/files) · `https://modelscope.cn/models/Qwen/Qwen1.5-14B-Chat/files`
+
+```bash
+(
+set -e
+python -m pip install modelscope-hub==0.7.1
+mkdir -p "model/Qwen1.5-14B-Chat"
+ms-hub download Qwen/Qwen1.5-14B-Chat --revision master \
+    --local-dir "$PWD/model/Qwen1.5-14B-Chat"
+test -s "$PWD/model/Qwen1.5-14B-Chat/config.json"
+test -s "$PWD/model/Qwen1.5-14B-Chat/model.safetensors.index.json"
+)
+```
+
+### 2. Run the quick test
+
+After the download completes, run the entire block below from the same repository root.
 
 ```bash
 (
 set -e
 export CUDA_VISIBLE_DEVICES="${CUDA_VISIBLE_DEVICES:-0}"
+QWEN_MODEL="$PWD/model/Qwen1.5-14B-Chat"
+if [ ! -s "$QWEN_MODEL/config.json" ] || [ ! -s "$QWEN_MODEL/model.safetensors.index.json" ]; then
+    printf '%s\n' 'Download Qwen1.5-14B-Chat in Step 1 above before running the quick test.' >&2
+    exit 1
+fi
 DATASET='RAG_MedQA_Mainland_train_500(example)'
 SAMPLE_COUNT=300
 
@@ -527,15 +552,6 @@ if len(samples) != sample_count:
     raise SystemExit(f"The prepared MedQA dataset needs at least {sample_count} examples.")
 Path(sys.argv[1]).write_text(json.dumps(samples, ensure_ascii=False), encoding="utf-8")
 PY
-
-if [ -z "${QWEN_MODEL:-}" ]; then
-    QWEN_MODEL="$PWD/models/Qwen1.5-14B-Chat"
-    python -m pip install modelscope-hub==0.7.1
-    ms-hub download Qwen/Qwen1.5-14B-Chat --revision master \
-        --local-dir "$QWEN_MODEL"
-fi
-test -f "$QWEN_MODEL/config.json"
-test -f "$QWEN_MODEL/model.safetensors.index.json"
 
 llamafactory-cli train \
     --model_name_or_path "$QWEN_MODEL" \
@@ -575,10 +591,9 @@ Each run saves the 300 input examples, prediction JSONL, and workbook in a new `
 
 ### Alternative download from Hugging Face
 
-If ModelScope downloads are unavailable, download the same Chat version from Hugging Face, set its local path, and then run the full quick-test block above. [Hugging Face Qwen1.5-14B-Chat](https://huggingface.co/Qwen/Qwen1.5-14B-Chat) · `https://huggingface.co/Qwen/Qwen1.5-14B-Chat`
+If ModelScope downloads are unavailable, download the same Chat version into the same directory, then run Step 2. [Hugging Face model files](https://huggingface.co/Qwen/Qwen1.5-14B-Chat) · `https://huggingface.co/Qwen/Qwen1.5-14B-Chat`
 
 ```bash
 huggingface-cli download Qwen/Qwen1.5-14B-Chat \
-    --local-dir "$PWD/models/Qwen1.5-14B-Chat"
-export QWEN_MODEL="$PWD/models/Qwen1.5-14B-Chat"
+    --local-dir "$PWD/model/Qwen1.5-14B-Chat"
 ```

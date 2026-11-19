@@ -82,15 +82,15 @@ source ~/.bashrc
 
 | 模型 | 企业魔搭地址 | 仓库内目录 | 本地模型目录 |
 | --- | --- | --- | --- |
-| Qwen1.5-14B（基座版） | [打开模型文件](https://modelscope.cn/models/zyxl2026/Qwen/files) · `https://modelscope.cn/models/zyxl2026/Qwen/files` | `Qwen1.5-14B/` | `models/Qwen1.5-14B/` |
-| Qwen2-7B-Instruct | [打开模型文件](https://modelscope.cn/models/zyxl2026/Qwen/files) · `https://modelscope.cn/models/zyxl2026/Qwen/files` | `Qwen2-7B-Instruct/` | `models/Qwen2-7B-Instruct/` |
-| Meta-Llama-3-8B-Instruct | [打开模型文件](https://modelscope.cn/models/zyxl2026/Llama/files) · `https://modelscope.cn/models/zyxl2026/Llama/files` | 仓库根目录 | `models/Meta-Llama-3-8B-Instruct/` |
+| Qwen1.5-14B（基座版） | [打开模型文件](https://modelscope.cn/models/zyxl2026/Qwen/files) · `https://modelscope.cn/models/zyxl2026/Qwen/files` | `Qwen1.5-14B/` | `model/Qwen1.5-14B/` |
+| Qwen2-7B-Instruct | [打开模型文件](https://modelscope.cn/models/zyxl2026/Qwen/files) · `https://modelscope.cn/models/zyxl2026/Qwen/files` | `Qwen2-7B-Instruct/` | `model/Qwen2-7B-Instruct/` |
+| Meta-Llama-3-8B-Instruct | [打开模型文件](https://modelscope.cn/models/zyxl2026/Llama/files) · `https://modelscope.cn/models/zyxl2026/Llama/files` | 仓库根目录 | `model/Meta-Llama-3-8B-Instruct/` |
 
 企业目录发布完整权重后，可在仓库根目录执行下方命令，按需选择对应模型下载。若企业目录仍只有初始化文件，可使用后面的 Hugging Face 备选方案。
 
 ```bash
 python -m pip install modelscope-hub==0.7.1
-MODEL_DIR="$PWD/models"
+MODEL_DIR="$PWD/model"
 mkdir -p "$MODEL_DIR"
 
 ms-hub download zyxl2026/Qwen --revision master \
@@ -116,7 +116,7 @@ test -f "$MODEL_DIR/Meta-Llama-3-8B-Instruct/config.json" && \
 下载 Llama 前，在官方模型页完成访问申请和协议确认，并运行 `huggingface-cli login` 登录获批账号。
 
 ```bash
-MODEL_DIR="$PWD/models"
+MODEL_DIR="$PWD/model"
 mkdir -p "$MODEL_DIR"
 
 huggingface-cli download Qwen/Qwen1.5-14B \
@@ -554,12 +554,37 @@ python format_json_dataset_for_eval_from_jsonl.py \
 
 ## 快速测试
 
-在已激活的 `llama_factory` 环境中，从仓库根目录复制执行整段命令。测试使用单张 NVIDIA A800 80GB GPU（CUDA），以 Qwen1.5-14B-Chat 对预处理 MedQA Mainland 文件的前 300 条带知识样本运行预测。默认从魔搭官方仓库下载到 `models/Qwen1.5-14B-Chat/` 后，使用本地模型目录运行预测。已有本地 Chat 权重时，先将 `QWEN_MODEL` 设为该模型目录。 [魔搭 Qwen1.5-14B-Chat](https://modelscope.cn/models/Qwen/Qwen1.5-14B-Chat/files) · `https://modelscope.cn/models/Qwen/Qwen1.5-14B-Chat/files` · [预处理 MedQA 数据](data/MedQA/RAG_MedQA_Mainland_train_500%28example%29.json)
+在已激活的 `llama_factory` 环境中，从仓库根目录按顺序执行下面两段命令。测试使用单张 NVIDIA A800 80GB GPU（CUDA），以 Qwen1.5-14B-Chat 对预处理 MedQA Mainland 文件的前 300 条带知识样本运行预测。模型目录固定为 `model/Qwen1.5-14B-Chat/`，测试命令已设置好本地路径。 [预处理 MedQA 数据](data/MedQA/RAG_MedQA_Mainland_train_500%28example%29.json)
+
+### 1. 下载模型
+
+将魔搭官方 Chat 权重下载到仓库内的 `model/Qwen1.5-14B-Chat/`，首次下载约 28.35 GB。下载中断后，重新执行同一段命令继续。 [魔搭模型文件](https://modelscope.cn/models/Qwen/Qwen1.5-14B-Chat/files) · `https://modelscope.cn/models/Qwen/Qwen1.5-14B-Chat/files`
+
+```bash
+(
+set -e
+python -m pip install modelscope-hub==0.7.1
+mkdir -p "model/Qwen1.5-14B-Chat"
+ms-hub download Qwen/Qwen1.5-14B-Chat --revision master \
+    --local-dir "$PWD/model/Qwen1.5-14B-Chat"
+test -s "$PWD/model/Qwen1.5-14B-Chat/config.json"
+test -s "$PWD/model/Qwen1.5-14B-Chat/model.safetensors.index.json"
+)
+```
+
+### 2. 运行快速测试
+
+下载完成后，在同一个仓库根目录执行下面整段命令。
 
 ```bash
 (
 set -e
 export CUDA_VISIBLE_DEVICES="${CUDA_VISIBLE_DEVICES:-0}"
+QWEN_MODEL="$PWD/model/Qwen1.5-14B-Chat"
+if [ ! -s "$QWEN_MODEL/config.json" ] || [ ! -s "$QWEN_MODEL/model.safetensors.index.json" ]; then
+    printf '%s\n' 'Download Qwen1.5-14B-Chat in Step 1 above before running the quick test.' >&2
+    exit 1
+fi
 DATASET='RAG_MedQA_Mainland_train_500(example)'
 SAMPLE_COUNT=300
 
@@ -588,15 +613,6 @@ if len(samples) != sample_count:
     raise SystemExit(f"The prepared MedQA dataset needs at least {sample_count} examples.")
 Path(sys.argv[1]).write_text(json.dumps(samples, ensure_ascii=False), encoding="utf-8")
 PY
-
-if [ -z "${QWEN_MODEL:-}" ]; then
-    QWEN_MODEL="$PWD/models/Qwen1.5-14B-Chat"
-    python -m pip install modelscope-hub==0.7.1
-    ms-hub download Qwen/Qwen1.5-14B-Chat --revision master \
-        --local-dir "$QWEN_MODEL"
-fi
-test -f "$QWEN_MODEL/config.json"
-test -f "$QWEN_MODEL/model.safetensors.index.json"
 
 llamafactory-cli train \
     --model_name_or_path "$QWEN_MODEL" \
@@ -636,10 +652,9 @@ PY
 
 ### Hugging Face 备选方案
 
-魔搭下载不可用时，可先通过 Hugging Face 下载同一 Chat 版本并设置本地模型目录，再执行上面的整段快速测试命令。 [Hugging Face Qwen1.5-14B-Chat](https://huggingface.co/Qwen/Qwen1.5-14B-Chat) · `https://huggingface.co/Qwen/Qwen1.5-14B-Chat`
+魔搭下载不可用时，将同一 Chat 版本下载到相同目录，再执行第 2 步。 [Hugging Face 模型文件](https://huggingface.co/Qwen/Qwen1.5-14B-Chat) · `https://huggingface.co/Qwen/Qwen1.5-14B-Chat`
 
 ```bash
 huggingface-cli download Qwen/Qwen1.5-14B-Chat \
-    --local-dir "$PWD/models/Qwen1.5-14B-Chat"
-export QWEN_MODEL="$PWD/models/Qwen1.5-14B-Chat"
+    --local-dir "$PWD/model/Qwen1.5-14B-Chat"
 ```
