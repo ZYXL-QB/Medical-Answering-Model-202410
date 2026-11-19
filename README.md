@@ -77,35 +77,63 @@ source ~/.bashrc
 
 
 ### 大模型参数下载(推荐)
-建议使用[https://hf-mirror.com/](https://hf-mirror.com/)下载大模型，参考其中的**方法三：使用 hfd**，可以做到稳定下载不断线，示例如下：
-* 设置环境变量
-```bash
-vim ~/.bashrc
-```
-在其中增加以下语句并且保存
-```bash
-export HF_ENDPOINT=https://hf-mirror.com
-```
-然后刷新环境配置
-```bash
-source ~/.bashrc
-```
 
-* 下载hfd工具
+优先使用企业魔搭仓库获取以下三个模型。Qwen 系列通过仓库内的子目录区分版本，Llama 权重位于单独仓库的根目录。
+
+| 模型 | 企业魔搭地址 | 仓库内目录 | 本地模型目录 |
+| --- | --- | --- | --- |
+| Qwen1.5-14B（基座版） | [打开模型文件](https://modelscope.cn/models/zyxl2026/Qwen/files) · `https://modelscope.cn/models/zyxl2026/Qwen/files` | `Qwen1.5-14B/` | `models/Qwen1.5-14B/` |
+| Qwen2-7B-Instruct | [打开模型文件](https://modelscope.cn/models/zyxl2026/Qwen/files) · `https://modelscope.cn/models/zyxl2026/Qwen/files` | `Qwen2-7B-Instruct/` | `models/Qwen2-7B-Instruct/` |
+| Meta-Llama-3-8B-Instruct | [打开模型文件](https://modelscope.cn/models/zyxl2026/Llama/files) · `https://modelscope.cn/models/zyxl2026/Llama/files` | 仓库根目录 | `models/Meta-Llama-3-8B-Instruct/` |
+
+企业目录发布完整权重后，可在仓库根目录执行下方命令，按需选择对应模型下载。若企业目录仍只有初始化文件，可使用后面的 Hugging Face 备选方案。
 
 ```bash
-cd <你的保存大模型的路径>
-wget https://hf-mirror.com/hfd/hfd.shchmod a+x hfd.sh
-chmod a+x hfd.sh
+python -m pip install modelscope-hub==0.7.1
+MODEL_DIR="$PWD/models"
+mkdir -p "$MODEL_DIR"
+
+ms-hub download zyxl2026/Qwen --revision master \
+    --local-dir "$MODEL_DIR" --include 'Qwen1.5-14B/*'
+test -f "$MODEL_DIR/Qwen1.5-14B/config.json" && \
+    test -f "$MODEL_DIR/Qwen1.5-14B/model.safetensors.index.json"
+
+ms-hub download zyxl2026/Qwen --revision master \
+    --local-dir "$MODEL_DIR" --include 'Qwen2-7B-Instruct/*'
+test -f "$MODEL_DIR/Qwen2-7B-Instruct/config.json" && \
+    test -f "$MODEL_DIR/Qwen2-7B-Instruct/model.safetensors.index.json"
+
+ms-hub download zyxl2026/Llama --revision master \
+    --local-dir "$MODEL_DIR/Meta-Llama-3-8B-Instruct"
+test -f "$MODEL_DIR/Meta-Llama-3-8B-Instruct/config.json" && \
+    test -f "$MODEL_DIR/Meta-Llama-3-8B-Instruct/model.safetensors.index.json"
 ```
 
-* 运行下载命令
+#### Hugging Face 备选方案
+
+使用环境依赖中已安装的 `huggingface-hub` 下载同一版本的官方权重。三个模型的地址分别为 [Qwen1.5-14B](https://huggingface.co/Qwen/Qwen1.5-14B)（`https://huggingface.co/Qwen/Qwen1.5-14B`）、[Qwen2-7B-Instruct](https://huggingface.co/Qwen/Qwen2-7B-Instruct)（`https://huggingface.co/Qwen/Qwen2-7B-Instruct`）和 [Meta-Llama-3-8B-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct)（`https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct`）。
+
+下载 Llama 前，在官方模型页完成访问申请和协议确认，并运行 `huggingface-cli login` 登录获批账号。
+
 ```bash
-cd <你的保存大模型的路径>
-./hfd.sh shenzhi-wang/Llama3-8B-Chinese-Chat --tool aria2c -x 4
-./hfd.sh Qwen/Qwen1.5-14B-Chat --tool aria2c -x 4
+MODEL_DIR="$PWD/models"
+mkdir -p "$MODEL_DIR"
+
+huggingface-cli download Qwen/Qwen1.5-14B \
+    --local-dir "$MODEL_DIR/Qwen1.5-14B"
+huggingface-cli download Qwen/Qwen2-7B-Instruct \
+    --local-dir "$MODEL_DIR/Qwen2-7B-Instruct"
+huggingface-cli download meta-llama/Meta-Llama-3-8B-Instruct \
+    --local-dir "$MODEL_DIR/Meta-Llama-3-8B-Instruct"
 ```
 
+快速测试使用 `Qwen1.5-14B-Chat`。需要本地加载该版本时，下载官方 Chat 权重并设置 `QWEN_MODEL`。 [Qwen1.5-14B-Chat](https://huggingface.co/Qwen/Qwen1.5-14B-Chat) · `https://huggingface.co/Qwen/Qwen1.5-14B-Chat`
+
+```bash
+huggingface-cli download Qwen/Qwen1.5-14B-Chat \
+    --local-dir "$PWD/models/Qwen1.5-14B-Chat"
+export QWEN_MODEL="$PWD/models/Qwen1.5-14B-Chat"
+```
 
 ## MedQA数据集
 * 数据集来源：[https://github.com/jind11/MedQA](https://github.com/jind11/MedQA)
@@ -532,7 +560,7 @@ python format_json_dataset_for_eval_from_jsonl.py \
 
 ## 快速测试
 
-在已激活的 `llama_factory` 环境中，从仓库根目录复制执行整段命令。测试使用单张 CUDA GPU，以 Qwen1.5-14B-Chat 基座对预处理 MedQA Mainland 文件的前 300 条带知识样本运行预测。默认通过 Hugging Face 加载模型。已有本地模型时，先将 `QWEN_MODEL` 设为模型目录。 [Qwen1.5-14B-Chat](https://huggingface.co/Qwen/Qwen1.5-14B-Chat) · [预处理 MedQA 数据](data/MedQA/RAG_MedQA_Mainland_train_500%28example%29.json)
+在已激活的 `llama_factory` 环境中，从仓库根目录复制执行整段命令。测试使用单张 NVIDIA A800 80GB GPU（CUDA），以 Qwen1.5-14B-Chat 基座对预处理 MedQA Mainland 文件的前 300 条带知识样本运行预测。默认通过 Hugging Face 加载模型。已有本地模型时，先将 `QWEN_MODEL` 设为模型目录。 [Qwen1.5-14B-Chat](https://huggingface.co/Qwen/Qwen1.5-14B-Chat) · [预处理 MedQA 数据](data/MedQA/RAG_MedQA_Mainland_train_500%28example%29.json)
 
 ```bash
 (

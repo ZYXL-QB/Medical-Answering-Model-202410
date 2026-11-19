@@ -69,17 +69,61 @@ source ~/.bashrc
 
 ### Download model weights
 
-The original download procedure uses `hfd` with the Hugging Face mirror. Set `HF_ENDPOINT` in your shell environment and download the model you plan to run into a directory with enough disk space. [Hugging Face mirror instructions](https://hf-mirror.com/)
+Use the enterprise ModelScope repositories as the primary source for the following models. The Qwen repository uses separate subdirectories for each version. The Llama repository stores its model files at the root.
+
+| Model | Enterprise ModelScope URL | Repository subdirectory | Local model directory |
+| --- | --- | --- | --- |
+| Qwen1.5-14B (base model) | [Browse model files](https://modelscope.cn/models/zyxl2026/Qwen/files) · `https://modelscope.cn/models/zyxl2026/Qwen/files` | `Qwen1.5-14B/` | `models/Qwen1.5-14B/` |
+| Qwen2-7B-Instruct | [Browse model files](https://modelscope.cn/models/zyxl2026/Qwen/files) · `https://modelscope.cn/models/zyxl2026/Qwen/files` | `Qwen2-7B-Instruct/` | `models/Qwen2-7B-Instruct/` |
+| Meta-Llama-3-8B-Instruct | [Browse model files](https://modelscope.cn/models/zyxl2026/Llama/files) · `https://modelscope.cn/models/zyxl2026/Llama/files` | Repository root | `models/Meta-Llama-3-8B-Instruct/` |
+
+Once the complete weights have been published to these locations, run the relevant commands below from the repository root. If an enterprise repository still contains only its initialization files, use the Hugging Face alternative below.
 
 ```bash
-export HF_ENDPOINT=https://hf-mirror.com
+python -m pip install modelscope-hub==0.7.1
 MODEL_DIR="$PWD/models"
 mkdir -p "$MODEL_DIR"
-cd "$MODEL_DIR"
-wget https://hf-mirror.com/hfd/hfd.sh
-chmod a+x hfd.sh
-./hfd.sh shenzhi-wang/Llama3-8B-Chinese-Chat --tool aria2c -x 4
-./hfd.sh Qwen/Qwen1.5-14B-Chat --tool aria2c -x 4
+
+ms-hub download zyxl2026/Qwen --revision master \
+    --local-dir "$MODEL_DIR" --include 'Qwen1.5-14B/*'
+test -f "$MODEL_DIR/Qwen1.5-14B/config.json" && \
+    test -f "$MODEL_DIR/Qwen1.5-14B/model.safetensors.index.json"
+
+ms-hub download zyxl2026/Qwen --revision master \
+    --local-dir "$MODEL_DIR" --include 'Qwen2-7B-Instruct/*'
+test -f "$MODEL_DIR/Qwen2-7B-Instruct/config.json" && \
+    test -f "$MODEL_DIR/Qwen2-7B-Instruct/model.safetensors.index.json"
+
+ms-hub download zyxl2026/Llama --revision master \
+    --local-dir "$MODEL_DIR/Meta-Llama-3-8B-Instruct"
+test -f "$MODEL_DIR/Meta-Llama-3-8B-Instruct/config.json" && \
+    test -f "$MODEL_DIR/Meta-Llama-3-8B-Instruct/model.safetensors.index.json"
+```
+
+#### Alternative download from Hugging Face
+
+Use the `huggingface-hub` package included in the project dependencies to download the corresponding official weights. The model pages are [Qwen1.5-14B](https://huggingface.co/Qwen/Qwen1.5-14B) (`https://huggingface.co/Qwen/Qwen1.5-14B`), [Qwen2-7B-Instruct](https://huggingface.co/Qwen/Qwen2-7B-Instruct) (`https://huggingface.co/Qwen/Qwen2-7B-Instruct`), and [Meta-Llama-3-8B-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) (`https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct`).
+
+Before downloading Llama, request access and accept the license on the official model page. Run `huggingface-cli login` with the account that has been granted access.
+
+```bash
+MODEL_DIR="$PWD/models"
+mkdir -p "$MODEL_DIR"
+
+huggingface-cli download Qwen/Qwen1.5-14B \
+    --local-dir "$MODEL_DIR/Qwen1.5-14B"
+huggingface-cli download Qwen/Qwen2-7B-Instruct \
+    --local-dir "$MODEL_DIR/Qwen2-7B-Instruct"
+huggingface-cli download meta-llama/Meta-Llama-3-8B-Instruct \
+    --local-dir "$MODEL_DIR/Meta-Llama-3-8B-Instruct"
+```
+
+The quick test uses `Qwen1.5-14B-Chat`. To load that version from disk, download the official Chat weights and set `QWEN_MODEL`. [Qwen1.5-14B-Chat](https://huggingface.co/Qwen/Qwen1.5-14B-Chat) · `https://huggingface.co/Qwen/Qwen1.5-14B-Chat`
+
+```bash
+huggingface-cli download Qwen/Qwen1.5-14B-Chat \
+    --local-dir "$PWD/models/Qwen1.5-14B-Chat"
+export QWEN_MODEL="$PWD/models/Qwen1.5-14B-Chat"
 ```
 
 ## MedQA Dataset
@@ -455,7 +499,7 @@ python format_json_dataset_for_eval_from_jsonl.py \
 
 ## Quick Test
 
-Run the entire block from the repository root with the `llama_factory` environment active. This test uses one CUDA GPU and runs the base Qwen1.5-14B-Chat model on the first 300 prepared MedQA Mainland examples with retrieved knowledge. The default model source is Hugging Face. Set `QWEN_MODEL` to the model directory if the weights are already on disk. [Qwen1.5-14B-Chat](https://huggingface.co/Qwen/Qwen1.5-14B-Chat) · [Prepared MedQA data](data/MedQA/RAG_MedQA_Mainland_train_500%28example%29.json)
+Run the entire block from the repository root with the `llama_factory` environment active. This test uses one NVIDIA A800 80GB GPU and runs the base Qwen1.5-14B-Chat model on the first 300 prepared MedQA Mainland examples with retrieved knowledge. The default model source is Hugging Face. Set `QWEN_MODEL` to the model directory if the weights are already on disk. [Qwen1.5-14B-Chat](https://huggingface.co/Qwen/Qwen1.5-14B-Chat) · [Prepared MedQA data](data/MedQA/RAG_MedQA_Mainland_train_500%28example%29.json)
 
 ```bash
 (
